@@ -1,0 +1,8 @@
+[package]
+name = "iced-tutorial"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = { version = "0.13.0-dev" }
+rfd = "0.14.1"
