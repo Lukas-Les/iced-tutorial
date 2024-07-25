@@ -1,40 +1,56 @@
-use iced::executor;
-use iced::{Application, Command, Element, Settings, Theme, Renderer};
-use iced::widget::{Button, row};
+use iced::{Sandbox, Command, Element, Settings, Theme, Renderer};
+use iced::widget::{Button, row, Text};
+
 
 pub fn main() -> iced::Result {
     Hello::run(Settings::default())
 }
 
-struct Hello;
+struct Hello {
+    target_files: Vec<Option<String>>,
+    result: Option<String>,
+}
 
-impl Application for Hello {
-    type Executor = executor::Default;
-    type Flags = ();
+impl Sandbox for Hello {
     type Message = Message;
-    type Theme = Theme;
 
-    fn new(_flags: ()) -> (Hello, Command<Self::Message>) {
-        (Hello, Command::none())
+    fn new() -> Hello {
+        Hello {
+            target_files: Vec::new(),
+            result: None
+        }
     }
 
     fn title(&self) -> String {
         String::from("A cool application")
     }
 
-    fn update(&mut self, _message: Self::Message) -> Command<Self::Message> {
-        Command::none()
+    fn update(&mut self, message: Self::Message) {
+        match message {
+            Message::LEFT_PRESSED => {
+                self.result = Some("pressed".to_string());
+            }
+            Message::RIGHT_PRESSED => {
+                self.result = None;
+            }
+        }
     }
 
     fn view(&self) -> Element<Self::Message> {
-        let files_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("Select files").on_press(Message::ButtonPressed);
-        let dir_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("Select directory").on_press(Message::ButtonPressed);
-        let content = row![files_button, dir_button];
+        let left_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("LEFT").on_press(Message::LEFT_PRESSED);
+        let right_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("RIGHT").on_press(Message::RIGHT_PRESSED);
+        let result_text = self.result.clone().unwrap_or_default();
+        let content = row![
+            left_button, 
+            Text::new(result_text),
+            right_button,
+        ];
         content.into()
     }
 }
 
 #[derive(Clone, Debug)]
 enum Message {
-    ButtonPressed,
+    LEFT_PRESSED,
+    RIGHT_PRESSED,
 }
