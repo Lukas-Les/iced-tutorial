@@ -1,40 +1,40 @@
-use iced::widget::{button, column, text, Column};
-use iced::Center;
+use iced::executor;
+use iced::{Application, Command, Element, Settings, Theme, Renderer};
+use iced::widget::{Button, row};
 
 pub fn main() -> iced::Result {
-    iced::run("A cool counter", Counter::update, Counter::view)
+    Hello::run(Settings::default())
 }
 
-#[derive(Default)]
-struct Counter {
-    value: i64,
+struct Hello;
+
+impl Application for Hello {
+    type Executor = executor::Default;
+    type Flags = ();
+    type Message = Message;
+    type Theme = Theme;
+
+    fn new(_flags: ()) -> (Hello, Command<Self::Message>) {
+        (Hello, Command::none())
+    }
+
+    fn title(&self) -> String {
+        String::from("A cool application")
+    }
+
+    fn update(&mut self, _message: Self::Message) -> Command<Self::Message> {
+        Command::none()
+    }
+
+    fn view(&self) -> Element<Self::Message> {
+        let files_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("Select files").on_press(Message::ButtonPressed);
+        let dir_button: iced::widget::Button<'_, Message, Theme, Renderer> = Button::new("Select directory").on_press(Message::ButtonPressed);
+        let content = row![files_button, dir_button];
+        content.into()
+    }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Debug)]
 enum Message {
-    Increment,
-    Decrement,
-}
-
-impl Counter {
-    fn update(&mut self, message: Message) {
-        match message {
-            Message::Increment => {
-                self.value += 1;
-            }
-            Message::Decrement => {
-                self.value -= 1;
-            }
-        }
-    }
-
-    fn view(&self) -> Column<Message> {
-        column![
-            button("Increment").on_press(Message::Increment),
-            text(self.value).size(50),
-            button("Decrement").on_press(Message::Decrement)
-        ]
-        .padding(20)
-        .align_x(Center)
-    }
+    ButtonPressed,
 }
