@@ -1,4 +1,4 @@
-use iced::widget::text_input::{self, Value};
+use iced::widget::text_editor::Content;
 use iced::{alignment, Alignment, Command, Element, Renderer, Sandbox, Settings, Theme};
 use iced::widget::{text, text_editor, Button, Column, Container, Row, TextInput};
 
@@ -8,7 +8,7 @@ pub fn main() -> iced::Result {
 
 struct Hello {
     target_paths: Option<Vec<String>>,
-    content: text_input::Value,
+    content: text_editor::Content,
 }
 
 impl Sandbox for Hello {
@@ -17,7 +17,7 @@ impl Sandbox for Hello {
     fn new() -> Hello {
         Hello {
             target_paths: None,
-            content: text_input::Value::new("The results will be desplayed here"),
+            content: text_editor::Content::with_text("The results will be desplayed here ^^"),
         }
     }
 
@@ -29,15 +29,16 @@ impl Sandbox for Hello {
         match message {
             Message::SelectFiles => {
                 self.target_paths = Some(vec!["a".to_string(), "b".to_string(), "new".to_string()]);
-                self.content = text_input::Value::new("files");
             }
             Message::SelectDir => {
                 self.target_paths = Some(vec!["d".to_string()]);
-                self.content = text_input::Value::new("dir");
             }
             Message::ResetResult => {
                 self.target_paths = None;
-                self.content = text_input::Value::new("The results will be desplayed here");
+                self.content = text_editor::Content::with_text("The results will be desplayed here");
+            }
+            Message::ActionPerformed(action) => {
+                self.content.perform(action);
             }
         }
     }
@@ -53,8 +54,8 @@ impl Sandbox for Hello {
         let top_row_container = Container::new(top_row)
             .padding(3)
             .center_x();
-
-        let result_display = TextInput::new("placeholder", &self.content.to_string());
+        let result_display = text_editor(&self.content)
+            .on_action(Message::ActionPerformed);
         let content = Column::new()
             .push(top_row_container)
             .push(result_display);
@@ -67,4 +68,5 @@ enum Message {
     SelectFiles,
     SelectDir,
     ResetResult,
+    ActionPerformed(text_editor::Action),
 }
